@@ -1,0 +1,57 @@
+#!/usr/bin/env python3
+import argparse
+import sys
+import requests
+
+### Variables that need to be set by user
+
+urlscan_api = ''
+
+### Stop editing!
+
+## argparse arguments
+parser = argparse.ArgumentParser(description='Wrapper for urlscan.io API')
+parser.add_argument('--url', help='--url google.com')
+parser.add_argument('--retrieve', help='--retrieve UUID')
+args = parser.parse_args()
+
+if urlscan_api == '':
+    print('Please input valid urlscan_api value in ' + sys.argv[0])
+    sys.exit(1)
+
+def submit():
+    headers = {
+        'Content-Type': 'application/json',
+        'API-Key': urlscan_api,
+    }
+
+    data = '{"url": "%s"}' % args.url
+
+    response = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=data)
+
+    ## end POST request
+
+    r = response.content.decode("utf-8")
+
+    print(r)
+
+
+
+def query():
+    response = requests.get("https://urlscan.io/api/v1/result/%s" % args.retrieve)
+
+    r = response.content.decode("utf-8")
+
+    print(r)
+
+
+
+def main():
+    if args.url:
+        submit()
+
+    if args.retrieve:
+        query()
+
+
+main()
