@@ -43,3 +43,10 @@ optional arguments:
   --url URL            --url google.com
   --retrieve RETRIEVE  --retrieve UUID
 ```
+
+
+## To do:
+
+1. Cache history of retrieved scans in JSON file located in ~/.urlscan/history.
+
+2. Add functionality to sort/filter through retrieved scans.
