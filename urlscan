@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 import argparse
 import sys
+import os
+import errno
 import time
+import pathlib
+import json
 import requests
 
-### Variables that need to be set by user
 
+### Variables that need to be set by user
 urlscan_api = ''
+### urlscan's config directory
+urlscan_dir = str(pathlib.Path.home()) + '/.urlscan'
+
 
 ### Stop editing!
 
@@ -14,6 +21,7 @@ urlscan_api = ''
 parser = argparse.ArgumentParser(description='Wrapper for urlscan.io API')
 parser.add_argument('--url', help='--url google.com', nargs='*')
 parser.add_argument('--retrieve', help='--retrieve UUID', nargs='*')
+parser.add_argument('--save', help='--save', action="store_true")
 args = parser.parse_args()
 
 if urlscan_api == '':
@@ -39,7 +47,6 @@ def submit():
 
         time.sleep(3)
 
-
 def query():
     for target_uuid in args.retrieve:
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
@@ -50,6 +57,17 @@ def query():
 
         time.sleep(3)
 
+    if args.save:
+        save_to_file(r)
+
+def save_to_file(x):
+    history_file = urlscan_dir + '/history.txt'
+
+    if not os.path.exists(urlscan_dir):
+        os.makedirs(urlscan_dir)
+
+    with open(history_file, 'a') as out:
+        out.write(x + '\n')
 
 
 def main():
