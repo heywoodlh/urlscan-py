@@ -3,6 +3,7 @@ import argparse
 import sys
 import os
 import errno
+import datetime
 import time
 import pathlib
 import json
@@ -19,9 +20,11 @@ urlscan_dir = str(pathlib.Path.home()) + '/.urlscan'
 
 ## argparse arguments
 parser = argparse.ArgumentParser(description='Wrapper for urlscan.io API')
-parser.add_argument('--url', help='--url google.com', nargs='*')
-parser.add_argument('--retrieve', help='--retrieve UUID', nargs='*')
-parser.add_argument('--save', help='--save', action="store_true")
+parser.add_argument('--url', help='URL to scan', nargs='+', metavar='URL')
+parser.add_argument('--retrieve', help='UUID to retrieve', nargs='+', metavar='UUID')
+parser.add_argument('--save', help='save UUID with a timestamp to index file for future reference', action="store_true")
+parser.add_argument('-d', '--dir', help='name of directory to save scans to', nargs='?')
+parser.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 args = parser.parse_args()
 
 if urlscan_api == '':
@@ -43,7 +46,8 @@ def submit():
 
         r = response.content.decode("utf-8")
 
-        print(r)
+        if not args.quiet:
+            print(r)
 
         time.sleep(3)
 
@@ -53,22 +57,38 @@ def query():
 
         r = response.content.decode("utf-8")
 
-        print(r)
+        if not args.quiet:
+            print(r)
 
         time.sleep(3)
 
-    if args.save:
-        save_to_file(r)
+        if args.save:
+            current_time = int(time.time())
+            human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
+            save_history(human_readable_time, target_uuid)
 
-def save_to_file(x):
+        if args.dir:
+            save_to_dir(args.dir, target_uuid, str(r))
+
+def save_history(x, y):
     history_file = urlscan_dir + '/history.txt'
 
     if not os.path.exists(urlscan_dir):
         os.makedirs(urlscan_dir)
 
     with open(history_file, 'a') as out:
-        out.write(x + '\n')
+        out.write(x + '\n' + y + '\n' + '\n')
 
+def save_to_dir(x, y, z):
+    if not os.path.exists(x):
+        os.makedirs(x)
+
+    save_file_name = x + '/' + y
+
+    path_to_file = pathlib.Path(save_file_name)
+    if not path_to_file.is_file():
+        with open(save_file_name, 'a') as out:
+            out.write(z)
 
 def main():
     if args.url:
