@@ -27,6 +27,8 @@ The `--url` flag can accept more than one URL at a time.
 
 `./urlscan scan --url https://google.com --save`
 
+This would allow the user to review the UUIDs of previously queued scans.
+
 #### Scan command help:
 
 ```
