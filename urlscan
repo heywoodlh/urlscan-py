@@ -19,13 +19,25 @@ urlscan_dir = str(pathlib.Path.home()) + '/.urlscan'
 ### Stop editing!
 
 ## argparse arguments
-parser = argparse.ArgumentParser(description='Wrapper for urlscan.io API')
-parser.add_argument('--url', help='URL to scan', nargs='+', metavar='URL')
-parser.add_argument('--retrieve', help='UUID to retrieve', nargs='+', metavar='UUID')
-parser.add_argument('--save', help='save UUID with a timestamp to index file for future reference', action="store_true")
-parser.add_argument('-d', '--dir', help='name of directory to save scans to', nargs='?')
-parser.add_argument('-q', '--quiet', help='suppress output', action="store_true")
+parser = argparse.ArgumentParser(description="Wrapper for urlscan.io's API")
+
+subparsers = parser.add_subparsers(help='sub-command help')
+
+## Scan parser
+parser_scan = subparsers.add_parser('scan', help='scan a url')
+parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL', required='True')
+parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_true")
+
+
+## Retrieve parser
+parser_retrieve = subparsers.add_parser('retrieve', help='retrieve scan results')
+parser_retrieve.add_argument('--uuid', help='UUID(s) to retrieve scans for', nargs='+', metavar='UUID', required='True')
+parser_retrieve.add_argument('-s', '--save', help='save UUID with a timestamp to index file for future reference', action="store_true")
+parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY')
+parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="store_true")
+
 args = parser.parse_args()
+
 
 if urlscan_api == '':
     print('Please input valid urlscan_api value in ' + sys.argv[0])
@@ -46,29 +58,29 @@ def submit():
 
         r = response.content.decode("utf-8")
 
-        if not args.quiet:
+        if not hasattr(args, 'quiet'):
             print(r)
 
         time.sleep(3)
 
 def query():
-    for target_uuid in args.retrieve:
+    for target_uuid in args.uuid:
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
 
         r = response.content.decode("utf-8")
 
-        if not args.quiet:
+        if not hasattr(args, 'quiet'):
             print(r)
 
         time.sleep(3)
 
-        if args.save:
+        if hasattr(args, 'save'):
             current_time = int(time.time())
             human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
             save_history(human_readable_time, target_uuid)
 
-        if args.dir:
-            save_to_dir(args.dir, target_uuid, str(r))
+        if hasattr(args, 'dir'):
+            save_to_dir(str(args.dir), target_uuid, str(r))
 
 def save_history(x, y):
     history_file = urlscan_dir + '/history.txt'
@@ -91,10 +103,10 @@ def save_to_dir(x, y, z):
             out.write(z)
 
 def main():
-    if args.url:
+    if hasattr(args, 'url'):
         submit()
 
-    if args.retrieve:
+    if hasattr(args, 'uuid'):
         query()
 
 
