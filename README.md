@@ -12,12 +12,12 @@ Urlscan-py is a Python wrapper for urlscan.io's API to scan URLs.
 
 ## Installation and Usage:
 
-Edit the urlscan_api variable in urlscan to equal a valid urlscan.io API key.
+Edit the urlscan_api variable in urlscan.py to equal a valid urlscan.io API key.
 
 
 ### Scanning:
 
-`./urlscan scan --url https://google.com`
+`./urlscan.py scan --url https://google.com`
 
 The resulting output will produce a UUID. The UUID will be needed in order to retrieve the scan results. The output will also indicate whether the scan was successfully started or not.
 
@@ -25,16 +25,16 @@ The `--url` flag can accept more than one URL at a time.
 
 #### Save scan results to ~/.urlscan/history.txt:
 
-`./urlscan scan --url https://google.com --save`
+`./urlscan.py scan --url https://google.com --save`
 
 This would allow the user to review the UUIDs of previously queued scans.
 
 #### Scan command help:
 
 ```
-./urlscan scan --help
+./urlscan.py scan --help
 
-usage: urlscan scan [-h] --url URL [URL ...] [-q]
+usage: urlscan.py scan [-h] --url URL [URL ...] [-q]
 
 optional arguments:
   -h, --help           show this help message and exit
@@ -48,13 +48,13 @@ optional arguments:
 
 ### Retrieve the scan results:
 
-`./urlscan retrieve --uuid UUID`
+`./urlscan.py retrieve --uuid UUID`
 
 This will print the scan with the associated UUID to STDOUT. The `--uuid` flag can accept more than one UUID at a time.
 
 #### Save retrieved results to directory:
 
-`./urlscan retrieve --uuid UUID --dir DIRECTORY`
+`./urlscan.py retrieve --uuid UUID --dir DIRECTORY`
 
 By default, scans will be saved to a directory called saved_scans in the same folder. Change this by using the `--dir` flag and specifying a different directory.
 
@@ -62,7 +62,7 @@ By default, scans will be saved to a directory called saved_scans in the same fo
 #### Retrieve command help:
 
 ```
-./urlscan retrieve --help
+./urlscan.py retrieve --help
 
 usage: urlscan retrieve [-h] --uuid UUID [UUID ...] [-s] [-d DIRECTORY] [-q]
 
