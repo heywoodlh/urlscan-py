@@ -26,13 +26,13 @@ subparsers = parser.add_subparsers(help='sub-command help')
 ## Scan parser
 parser_scan = subparsers.add_parser('scan', help='scan a url')
 parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL', required='True')
+parser_scan.add_argument('-s', '--save', help='save initiated scans with a timestamp to index file for future use', action="store_true")
 parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
 
 ## Retrieve parser
 parser_retrieve = subparsers.add_parser('retrieve', help='retrieve scan results')
 parser_retrieve.add_argument('--uuid', help='UUID(s) to retrieve scans for', nargs='+', metavar='UUID', required='True')
-parser_retrieve.add_argument('-s', '--save', help='save UUID with a timestamp to index file for future reference', action="store_true")
 parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY')
 parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
@@ -58,8 +58,14 @@ def submit():
 
         r = response.content.decode("utf-8")
 
-        if not hasattr(args, 'quiet'):
+        if not args.quiet:
             print(r)
+
+        if hasattr(args, 'save'):
+            current_time = int(time.time())
+            human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
+            save_history(human_readable_time, str(r))
+
 
         time.sleep(3)
 
@@ -69,18 +75,13 @@ def query():
 
         r = response.content.decode("utf-8")
 
-        if not hasattr(args, 'quiet'):
+        if not args.quiet:
             print(r)
-
-        time.sleep(3)
-
-        if hasattr(args, 'save'):
-            current_time = int(time.time())
-            human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
-            save_history(human_readable_time, target_uuid)
 
         if hasattr(args, 'dir'):
             save_to_dir(str(args.dir), target_uuid, str(r))
+
+        time.sleep(3)
 
 def save_history(x, y):
     history_file = urlscan_dir + '/history.txt'
