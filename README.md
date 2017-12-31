@@ -15,7 +15,7 @@ Urlscan-py is a Python wrapper for urlscan.io's API to scan URLs.
 Edit the urlscan_api variable in urlscan to equal a valid urlscan.io API key.
 
 
-#### Scanning:
+### Scanning:
 
 `./urlscan scan --url https://google.com`
 
@@ -23,6 +23,11 @@ The resulting output will produce a UUID. The UUID will be needed in order to re
 
 The `--url` flag can accept more than one URL at a time.
 
+#### Save scan results to ~/.urlscan/history.txt:
+
+`./urlscan scan --url https://google.com --save`
+
+#### Scan command help:
 
 ```
 ./urlscan scan --help
@@ -32,11 +37,14 @@ usage: urlscan scan [-h] --url URL [URL ...] [-q]
 optional arguments:
   -h, --help           show this help message and exit
   --url URL [URL ...]  URL(s) to scan
+  -s, --save           save initiated scans with a timestamp to index file for
+                       future use
   -q, --quiet          suppress output
 ```
 
 
-#### Retrieve the scan results:
+
+### Retrieve the scan results:
 
 `./urlscan retrieve --uuid UUID`
 
@@ -45,6 +53,11 @@ This will print the scan with the associated UUID to STDOUT. The `--uuid` flag c
 #### Save retrieved results to directory:
 
 `./urlscan retrieve --uuid UUID --dir DIRECTORY`
+
+By default, scans will be saved to a directory called saved_scans in the same folder. Change this by using the `--dir` flag and specifying a different directory.
+
+
+#### Retrieve command help:
 
 ```
 ./urlscan retrieve --help
@@ -55,8 +68,6 @@ optional arguments:
   -h, --help            show this help message and exit
   --uuid UUID [UUID ...]
                         UUID(s) to retrieve scans for
-  -s, --save            save UUID with a timestamp to index file for future
-                        reference
   -d, --dir DIRECTORY
                         directory to save scans to
   -q, --quiet           suppress output
