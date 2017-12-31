@@ -57,7 +57,7 @@ optional arguments:
                         UUID(s) to retrieve scans for
   -s, --save            save UUID with a timestamp to index file for future
                         reference
-  -d DIRECTORY, --dir DIRECTORY
+  -d, --dir DIRECTORY
                         directory to save scans to
   -q, --quiet           suppress output
 ```

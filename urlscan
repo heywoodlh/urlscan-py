@@ -33,7 +33,7 @@ parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_
 ## Retrieve parser
 parser_retrieve = subparsers.add_parser('retrieve', help='retrieve scan results')
 parser_retrieve.add_argument('--uuid', help='UUID(s) to retrieve scans for', nargs='+', metavar='UUID', required='True')
-parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY')
+parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY', default='saved_scans')
 parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
 args = parser.parse_args()
