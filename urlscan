@@ -61,7 +61,7 @@ def submit():
         if not args.quiet:
             print(r)
 
-        if hasattr(args, 'save'):
+        if args.save:
             current_time = int(time.time())
             human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
             save_history(human_readable_time, str(r))
