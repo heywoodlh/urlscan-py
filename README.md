@@ -92,9 +92,7 @@ optional arguments:
 
 ## To do:
 
-1. Add functionality to sort/filter through retrieved scans.
-2. Store the UUIDs from the submission in a local database (sqlite)
-3. Periodically poll the urlscan.io API to see if a scan is finished
-4. If it's finished, download the API reply, the screenshot and the DOM
-5. Provide an additional option to also attempt to download the response
+1. Periodically poll the urlscan.io API to see if a scan is finished
+2. If it's finished, download the API reply, the screenshot and the DOM
+3. Provide an additional option to also attempt to download the response
   files.
