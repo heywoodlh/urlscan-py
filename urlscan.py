@@ -26,7 +26,7 @@ subparsers = parser.add_subparsers(help='sub-command help', dest='command')
 ## Scan parser
 parser_scan = subparsers.add_parser('scan', help='scan a url')
 parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL', required='True')
-parser_scan.add_argument('-s', '--save', help='save initiated scans with a timestamp to index file for future use', action="store_true")
+parser_scan.add_argument('-s', '--save', help='save initiated scans with a timestamp to file for future use', default="query_results", metavar='FILE')
 parser_scan.add_argument('-f', '--file', help='file with url(s) to scan')
 parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
@@ -93,7 +93,7 @@ def query():
 
 
 def save_history(x, y):
-    history_file = urlscan_dir + '/history.txt'
+    history_file = args.save
 
     if not os.path.exists(urlscan_dir):
         os.makedirs(urlscan_dir)

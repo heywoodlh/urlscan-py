@@ -29,11 +29,15 @@ The resulting output will produce a UUID. The UUID will be needed in order to re
 
 The `--url` flag can accept more than one URL at a time.
 
-#### Save scan queue UUID results to ~/.urlscan/history.txt:
+#### Save scan queue UUID results to file:
 
 `./urlscan.py scan --url https://google.com --save`
 
-This would allow the user to review the UUIDs of previously queued scans.
+This would allow the user to review the UUIDs of previously queued scans. This defaults to a file named 'query_results' within the same directory. The `--save` argument can be used to specify a different file to save the queried scan results to like so:
+
+`./urlscan.py scan --url https://google.com --save scanfile.txt`
+
+The scans are saved with a time stamp directly above each saved scan initiation result.
 
 #### Scan multiple domains stored in file 'example-domains.txt' and save queued scans' UUIDs
 
@@ -46,12 +50,12 @@ Each domain should be stored in a file with each domain separated by a newline
 ```
 ./urlscan.py scan --help
 
-usage: urlscan.py scan [-h] --url URL [URL ...] [-s] [-f FILE] [-q]
+usage: urlscan.py scan [-h] --url URL [URL ...] [-s FILE] [-f FILE] [-q]
 
 optional arguments:
   -h, --help            show this help message and exit
   --url URL [URL ...]   URL(s) to scan
-  -s, --save            save initiated scans with a timestamp to index file
+  -s FILE, --save FILE  save initiated scans with a timestamp to file
                         for future use
   -f FILE, --file FILE  file with url(s) to scan
   -q, --quiet           suppress output
@@ -92,10 +96,9 @@ optional arguments:
 
 ## To do:
 
-1.  Add functionality to sort/filter through retrieved scans.
-2. Submit a list of URLs from file / stdin
-3. Store the UUIDs from the submission in a local database (sqlite)
-4. Periodically poll the urlscan.io API to see if a scan is finished
-5. If it's finished, download the API reply, the screenshot and the DOM
-6. Provide an additional option to also attempt to download the response
+1. Add functionality to sort/filter through retrieved scans.
+2. Store the UUIDs from the submission in a local database (sqlite)
+3. Periodically poll the urlscan.io API to see if a scan is finished
+4. If it's finished, download the API reply, the screenshot and the DOM
+5. Provide an additional option to also attempt to download the response
   files.
