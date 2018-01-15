@@ -16,8 +16,14 @@ urlscan_api = ''
 ### urlscan's config directory
 urlscan_dir = str(pathlib.Path.home()) + '/.urlscan'
 
+### urlscan's local database
+urlscan_default_db = urlscan_dir + '/urlscan.db'
+
 
 ### Stop editing!
+
+if not os.path.exists(urlscan_dir):
+        os.makedirs(urlscan_dir)
 
 ## argparse arguments
 parser = argparse.ArgumentParser(description="Wrapper for urlscan.io's API")
@@ -27,7 +33,7 @@ subparsers = parser.add_subparsers(help='sub-command help', dest='command')
 ## Scan parser
 parser_scan = subparsers.add_parser('scan', help='scan a url')
 parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL', required='True')
-parser_scan.add_argument('--db', help='specify different database file initiated scans will be saved to', metavar='FILE', default='urlscan.db')
+parser_scan.add_argument('--db', help='specify different database file initiated scans will be saved to', metavar='FILE', default=urlscan_default_db)
 parser_scan.add_argument('-f', '--file', help='file with url(s) to scan')
 parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
