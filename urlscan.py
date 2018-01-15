@@ -1,14 +1,9 @@
 #!/usr/bin/env python3
-import argparse
-import sys
-import os
-import errno
-import datetime
-import time
-import pathlib
-import string
-import json
-import requests
+import argparse, arghandler
+import sys, os
+import errno, pathlib, re
+import datetime, time
+import json, requests
 import sqlite3
 
 ### Variables that need to be set by user
@@ -37,6 +32,10 @@ parser_scan.add_argument('--db', help='specify different database file initiated
 parser_scan.add_argument('-f', '--file', help='file with url(s) to scan')
 parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
+## Search parser
+parser_search = subparsers.add_parser('search', help='search database for UUID of url')
+parser_search.add_argument('--host', help='host(s) to search for matching UUID', nargs='+', metavar='HOST')
+parser_search.add_argument('--db', help='specify different database file to search', metavar='FILE', default=urlscan_default_db)
 
 ## Retrieve parser
 parser_retrieve = subparsers.add_parser('retrieve', help='retrieve scan results')
@@ -82,6 +81,14 @@ def submit():
         time.sleep(3)
 
 
+def search():
+    search_urls = args.host
+    db_connect()
+    for url in search_urls:
+        t = (url,)
+        c.execute('SELECT * FROM scanned_urls WHERE url=?', t)
+        print(c.fetchone())
+    
 
 def query():
     for target_uuid in args.uuid:
@@ -103,17 +110,13 @@ def save_history(x, y):
     matched_lines = [line for line in y.split('\n') if "uuid" in line]
     result = ''.join(matched_lines)
     result = result.split(":",1)[1]
-    def strip_punctuation(s):
-        return ''.join(c for c in s if c not in string.punctuation)
-    result = strip_punctuation(result)
-    uuid = result.strip()
+    uuid = re.sub(r'[^a-zA-Z0-9=-]', '', result)
     ### end UUID extraction
 
     target_url = str(x)
     current_time = int(time.time())
     human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
-    conn = sqlite3.connect(args.db)
-    c = conn.cursor()
+    db_connect()
     c.execute('''CREATE TABLE IF NOT EXISTS scanned_urls (url, uuid, datetime)''')
     c.execute("INSERT INTO scanned_urls VALUES (?, ?, ?)", (target_url, uuid, human_readable_time))
     conn.commit()
@@ -131,15 +134,23 @@ def save_to_dir(x, y, z):
         with open(save_file_name, 'a') as out:
             out.write(z)
 
+def db_connect():
+    global conn
+    conn = sqlite3.connect(args.db)
+    global c
+    c = conn.cursor()
 
 
 def main():
     if hasattr(args, 'url'):
         submit()
 
+    if hasattr(args, 'host'):
+        search()
+
     if hasattr(args, 'uuid'):
         query()
 
 
-
-main()
+if __name__ == '__main__':
+    main()
