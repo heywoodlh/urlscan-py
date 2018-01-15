@@ -117,7 +117,7 @@ def save_history(x, y):
     current_time = int(time.time())
     human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
     db_connect()
-    c.execute('''CREATE TABLE IF NOT EXISTS scanned_urls (url TEXT PRIMARY KEY, uuid, datetime)''')
+    c.execute('''CREATE TABLE IF NOT EXISTS scanned_urls (url, uuid, datetime TEXT PRIMARY KEY)''')
     c.execute("INSERT OR REPLACE INTO scanned_urls VALUES (?, ?, ?)", (target_url, uuid, human_readable_time))
     conn.commit()
     conn.close()
