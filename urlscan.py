@@ -6,9 +6,10 @@ import errno
 import datetime
 import time
 import pathlib
+import string
 import json
 import requests
-
+import sqlite3
 
 ### Variables that need to be set by user
 urlscan_api = ''
@@ -26,7 +27,7 @@ subparsers = parser.add_subparsers(help='sub-command help', dest='command')
 ## Scan parser
 parser_scan = subparsers.add_parser('scan', help='scan a url')
 parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL', required='True')
-parser_scan.add_argument('-s', '--save', help='save initiated scans with a timestamp to file for future use', default="query_results", metavar='FILE')
+parser_scan.add_argument('--db', help='specify different database file initiated scans will be saved to', metavar='FILE', default='urlscan.db')
 parser_scan.add_argument('-f', '--file', help='file with url(s) to scan')
 parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
@@ -68,13 +69,12 @@ def submit():
         if not args.quiet:
             print(r)
 
-        if args.save:
-            current_time = int(time.time())
-            human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
-            save_history(human_readable_time, str(r))
+        if args.db:
+            save_history(target_urls, r)
 
 
         time.sleep(3)
+
 
 
 def query():
@@ -93,13 +93,25 @@ def query():
 
 
 def save_history(x, y):
-    history_file = args.save
+    ### extract UUID from json
+    matched_lines = [line for line in y.split('\n') if "uuid" in line]
+    result = ''.join(matched_lines)
+    result = result.split(":",1)[1]
+    def strip_punctuation(s):
+        return ''.join(c for c in s if c not in string.punctuation)
+    result = strip_punctuation(result)
+    uuid = result.strip()
+    ### end UUID extraction
 
-    if not os.path.exists(urlscan_dir):
-        os.makedirs(urlscan_dir)
-
-    with open(history_file, 'a') as out:
-        out.write(x + '\n' + y + '\n' + '\n')
+    target_url = str(x)
+    current_time = int(time.time())
+    human_readable_time = str(datetime.datetime.fromtimestamp(current_time))
+    conn = sqlite3.connect(args.db)
+    c = conn.cursor()
+    c.execute('''CREATE TABLE IF NOT EXISTS scanned_urls (url, uuid, datetime)''')
+    c.execute("INSERT INTO scanned_urls VALUES (?, ?, ?)", (target_url, uuid, human_readable_time))
+    conn.commit()
+    conn.close()
 
 
 def save_to_dir(x, y, z):

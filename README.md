@@ -29,19 +29,15 @@ The resulting output will produce a UUID. The UUID will be needed in order to re
 
 The `--url` flag can accept more than one URL at a time.
 
-#### Save scan queue UUID results to file:
+#### Save scan queue UUID results to different database file:
 
-`./urlscan.py scan --url https://google.com --save`
+`./urlscan.py scan --url https://google.com --db mydatabase.db`
 
-This would allow the user to review the UUIDs of previously queued scans. This defaults to a file named 'query_results' within the same directory. The `--save` argument can be used to specify a different file to save the queried scan results to like so:
+This would allow the user to easily review the UUIDs of previously queued scans in an sqlite3 database. This defaults to a file named 'urlscan.db' within the same directory if no other file is specified.
 
-`./urlscan.py scan --url https://google.com --save scanfile.txt`
+#### Scan multiple domains stored in file 'example-domains.txt'
 
-The scans are saved with a time stamp directly above each saved scan initiation result.
-
-#### Scan multiple domains stored in file 'example-domains.txt' and save queued scans' UUIDs
-
-`./urlscan.py scan --url * --file 'example-domains.txt' --save`
+`./urlscan.py scan --url * --file 'example-domains.txt'`
 
 Each domain should be stored in a file with each domain separated by a newline
 
@@ -55,8 +51,8 @@ usage: urlscan.py scan [-h] --url URL [URL ...] [-s FILE] [-f FILE] [-q]
 optional arguments:
   -h, --help            show this help message and exit
   --url URL [URL ...]   URL(s) to scan
-  -s FILE, --save FILE  save initiated scans with a timestamp to file
-                        for future use
+  --db FILE             specify different database file initiated scans 
+                        will be saved to
   -f FILE, --file FILE  file with url(s) to scan
   -q, --quiet           suppress output
 
