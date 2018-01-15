@@ -21,12 +21,13 @@ urlscan_dir = str(pathlib.Path.home()) + '/.urlscan'
 ## argparse arguments
 parser = argparse.ArgumentParser(description="Wrapper for urlscan.io's API")
 
-subparsers = parser.add_subparsers(help='sub-command help')
+subparsers = parser.add_subparsers(help='sub-command help', dest='command')
 
 ## Scan parser
 parser_scan = subparsers.add_parser('scan', help='scan a url')
 parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL', required='True')
 parser_scan.add_argument('-s', '--save', help='save initiated scans with a timestamp to index file for future use', action="store_true")
+parser_scan.add_argument('-f', '--file', help='file with url(s) to scan')
 parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
 
@@ -43,8 +44,14 @@ if urlscan_api == '':
     print('Please input valid urlscan_api value in ' + sys.argv[0])
     sys.exit(1)
 
+
 def submit():
-    for target_urls in args.url:
+    if args.file: 
+        urls_to_scan = [line.rstrip('\n') for line in open(args.file)]
+    else:
+        urls_to_scan = args.url
+
+    for target_urls in urls_to_scan:
         headers = {
             'Content-Type': 'application/json',
             'API-Key': urlscan_api,
@@ -69,6 +76,7 @@ def submit():
 
         time.sleep(3)
 
+
 def query():
     for target_uuid in args.uuid:
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
@@ -83,6 +91,7 @@ def query():
 
         time.sleep(3)
 
+
 def save_history(x, y):
     history_file = urlscan_dir + '/history.txt'
 
@@ -91,6 +100,7 @@ def save_history(x, y):
 
     with open(history_file, 'a') as out:
         out.write(x + '\n' + y + '\n' + '\n')
+
 
 def save_to_dir(x, y, z):
     if not os.path.exists(x):
@@ -103,12 +113,15 @@ def save_to_dir(x, y, z):
         with open(save_file_name, 'a') as out:
             out.write(z)
 
+
+
 def main():
     if hasattr(args, 'url'):
         submit()
 
     if hasattr(args, 'uuid'):
         query()
+
 
 
 main()

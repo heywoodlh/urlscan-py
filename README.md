@@ -29,25 +29,33 @@ The resulting output will produce a UUID. The UUID will be needed in order to re
 
 The `--url` flag can accept more than one URL at a time.
 
-#### Save scan results to ~/.urlscan/history.txt:
+#### Save scan queue UUID results to ~/.urlscan/history.txt:
 
 `./urlscan.py scan --url https://google.com --save`
 
 This would allow the user to review the UUIDs of previously queued scans.
+
+#### Scan multiple domains stored in file 'example-domains.txt' and save queued scans' UUIDs
+
+`./urlscan.py scan --url * --file 'example-domains.txt' --save`
+
+Each domain should be stored in a file with each domain separated by a newline
 
 #### Scan command help:
 
 ```
 ./urlscan.py scan --help
 
-usage: urlscan.py scan [-h] --url URL [URL ...] [-q]
+usage: urlscan.py scan [-h] --url URL [URL ...] [-s] [-f FILE] [-q]
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --url URL [URL ...]  URL(s) to scan
-  -s, --save           save initiated scans with a timestamp to index file for
-                       future use
-  -q, --quiet          suppress output
+  -h, --help            show this help message and exit
+  --url URL [URL ...]   URL(s) to scan
+  -s, --save            save initiated scans with a timestamp to index file
+                        for future use
+  -f FILE, --file FILE  file with url(s) to scan
+  -q, --quiet           suppress output
+
 ```
 
 
