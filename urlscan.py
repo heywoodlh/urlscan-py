@@ -7,7 +7,7 @@ import json, requests
 import sqlite3
 
 ### Variables that need to be set by user
-urlscan_api = ''
+
 ### urlscan's config directory
 urlscan_dir = str(pathlib.Path.home()) + '/.urlscan'
 
@@ -40,15 +40,28 @@ parser_search.add_argument('--db', help='specify different database file to sear
 ## Retrieve parser
 parser_retrieve = subparsers.add_parser('retrieve', help='retrieve scan results')
 parser_retrieve.add_argument('--uuid', help='UUID(s) to retrieve scans for', nargs='+', metavar='UUID', required='True')
+parser_retrieve.add_argument('--db', help='specify different database file to query', metavar='FILE', default=urlscan_default_db)
 parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY', default='saved_scans')
 parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 
 args = parser.parse_args()
 
-
-if urlscan_api == '':
-    print('Please input valid urlscan_api value in ' + sys.argv[0])
-    sys.exit(1)
+global conn
+conn = sqlite3.connect(args.db)
+global c
+c = conn.cursor()
+try:
+    c.execute("SELECT * FROM api")
+    db_extract = c.fetchone()
+    urlscan_api = ''.join(db_extract)
+except sqlite3.OperationalError:
+    c.execute('''CREATE TABLE api (key TEXT PRIMARY KEY)''')
+    urlscan_api = input('Please enter API key: ')
+    c.execute("INSERT OR REPLACE INTO api VALUES (?)", (urlscan_api,))
+    c.execute("SELECT * FROM api")
+    db_extract = c.fetchone()
+    urlscan_api = ''.join(db_extract)
+    conn.commit()
 
 
 def submit():
