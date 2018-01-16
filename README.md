@@ -80,7 +80,7 @@ This will print the scan with the associated UUID to STDOUT. The `--uuid` flag c
 
 `./urlscan.py retrieve --uuid UUID --dir DIRECTORY`
 
-By default, scans will be saved to a directory called saved_scans in the same folder. Change this by using the `--dir` flag and specifying a different directory.
+By default, scans will be saved to the directory `~/.urlscan/saved_scans`. Change this by using the `--dir` flag and specifying a different directory.
 
 
 #### Retrieve command help:
