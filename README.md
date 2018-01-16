@@ -5,9 +5,11 @@
 Urlscan-py is a Python wrapper for urlscan.io's API to scan URLs.
 
 
+
 ## Requirements:
 
 - Python3
+
 
 
 ## Installation and Usage:
@@ -17,6 +19,7 @@ Urlscan-py is a Python wrapper for urlscan.io's API to scan URLs.
 `cd urlscan-py`
 
 `sudo pip3 install -r requirements.txt`
+
 
 ### Saving the API key:
 
@@ -39,17 +42,20 @@ The resulting output will produce a UUID. The UUID will be needed in order to re
 
 The `--url` flag can accept more than one URL at a time.
 
+
 #### Save scan queue UUID results to different database file:
 
 `./urlscan.py scan --url https://google.com --db mydatabase.db`
 
 This would allow the user to easily review the UUIDs of previously queued scans in an sqlite3 database. This defaults to a file named '~/.urlscan/urlscan.db' if no other database file is specified.
 
+
 #### Scan multiple domains stored in file 'example-domains.txt'
 
 `./urlscan.py scan --url * --file 'example-domains.txt'`
 
 Each domain should be stored in a file with each domain separated by a newline
+
 
 #### Scan command help:
 
@@ -75,6 +81,7 @@ optional arguments:
 `./urlscan.py retrieve --uuid UUID`
 
 This will print the scan with the associated UUID to STDOUT. The `--uuid` flag can accept more than one UUID at a time.
+
 
 #### Save retrieved results to directory:
 
