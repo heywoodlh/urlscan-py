@@ -18,7 +18,17 @@ Urlscan-py is a Python wrapper for urlscan.io's API to scan URLs.
 
 `sudo pip3 install -r requirements.txt`
 
-Edit the urlscan_api variable in urlscan.py to equal a valid urlscan.io API key.
+### Saving the API key:
+
+The API key will be stored in the default database that stores all initiated scan results. By default, this database is in `~/.urlscan/urlscan.db`. 
+
+To save the API key, attempt to do your first scan. You will then be prompted to enter the API key, which will be stored in the database for future use. 
+
+If the API key is entered incorrectly or some other error occurs in which the API key value in the database is incorrect, remove the database file:
+
+`rm ~/.urlscan/urlscan.py`
+
+When another scan is attempted, the prompt on the first run will come up and you can enter the API key. 
 
 
 ### Scanning:
@@ -46,7 +56,7 @@ Each domain should be stored in a file with each domain separated by a newline
 ```
 ./urlscan.py scan --help
 
-usage: urlscan.py scan [-h] --url URL [URL ...] [-s FILE] [-f FILE] [-q]
+usage: urlscan.py scan [-h] --url URL [URL ...] [--db FILE] [-f FILE] [-q]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -78,12 +88,13 @@ By default, scans will be saved to a directory called saved_scans in the same fo
 ```
 ./urlscan.py retrieve --help
 
-usage: urlscan retrieve [-h] --uuid UUID [UUID ...] [-s] [-d DIRECTORY] [-q]
+usage: urlscan retrieve [-h] --uuid UUID [UUID ...] [--db FILE] [-d DIRECTORY] [-q]
 
 optional arguments:
   -h, --help            show this help message and exit
   --uuid UUID [UUID ...]
                         UUID(s) to retrieve scans for
+  --db FILE             specify different database file to query
   -d, --dir DIRECTORY
                         directory to save scans to
   -q, --quiet           suppress output
@@ -94,5 +105,4 @@ optional arguments:
 
 1. Periodically poll the urlscan.io API to see if a scan is finished
 2. If it's finished, download the API reply, the screenshot and the DOM
-3. Provide an additional option to also attempt to download the response
-  files.
+3. Provide an additional option to also attempt to download the response files.
