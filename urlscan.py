@@ -47,12 +47,10 @@ parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="st
 args = parser.parse_args()
 
 global conn
-if hasattr(args, 'db'):
-    conn = sqlite3.connect(args.db)
-else:
-    conn = sqlite3.connect(urlscan_default_db) 
+conn = sqlite3.connect(args.db)
 global c
 c = conn.cursor()
+
 try:
     c.execute("SELECT * FROM api")
     db_extract = c.fetchone()
