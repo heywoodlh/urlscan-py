@@ -47,7 +47,10 @@ parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="st
 args = parser.parse_args()
 
 global conn
-conn = sqlite3.connect(args.db)
+if hasattr(args, 'db'):
+    conn = sqlite3.connect(args.db)
+else:
+    conn = sqlite3.connect(urlscan_default_db) 
 global c
 c = conn.cursor()
 try:
