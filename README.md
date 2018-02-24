@@ -25,11 +25,11 @@ Urlscan-py is a Python wrapper for urlscan.io's API to scan URLs.
 
 The API key will be stored in the default database that stores all initiated scan results. By default, this database is in `~/.urlscan/urlscan.db`. 
 
-To save the API key, attempt to do your first scan. You will then be prompted to enter the API key, which will be stored in the database for future use. 
+To save the API key, use the `init` command:
 
-If the API key is entered incorrectly or some other error occurs in which the API key value in the database is incorrect, remove the database file:
+`./urlscan.py init --api_key xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
 
-`rm ~/.urlscan/urlscan.py`
+If the API key is entered incorrectly or some other error occurs in which the API key value in the database is incorrect, either attempt to overwrite it with the above init command or remove the database file with this command: `rm ~/.urlscan/urlscan.py`.
 
 When another scan is attempted, the prompt on the first run will come up and you can enter the API key. 
 
