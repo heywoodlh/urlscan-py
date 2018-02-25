@@ -32,7 +32,7 @@ parser_init.add_argument('--db', help='specify different database file to search
 
 ## Scan parser
 parser_scan = subparsers.add_parser('scan', help='scan a url')
-parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL', required='True')
+parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL')
 parser_scan.add_argument('--db', help='specify different database file initiated scans will be saved to', metavar='FILE', default=urlscan_default_db)
 parser_scan.add_argument('-f', '--file', help='file with url(s) to scan')
 parser_scan.add_argument('-q', '--quiet', help='suppress output', action="store_true")
@@ -75,6 +75,7 @@ def add_key_value():
         urlscan_api = input('Please enter API key: ')
     c.execute("INSERT OR REPLACE INTO api VALUES (?)", (urlscan_api,))
     conn.commit()
+    sys.exit(0)
 
 
 def get_key_value():
@@ -85,7 +86,11 @@ def get_key_value():
     except sqlite3.OperationalError:
         add_key_value()
     db_extract = c.fetchone()
-    urlscan_api = ''.join(db_extract)
+    try:
+        urlscan_api = ''.join(db_extract)
+    except TypeError:
+        print('Invalid API entry in database.')
+        sys.exit(1)
 
 def initialize():
     global urlscan_api
