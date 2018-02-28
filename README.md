@@ -11,4 +11,5 @@ See [Installation and Usage](https://github.com/heywoodlh/urlscan-py/wiki/Instal
 
 
 Author: Spencer Heywood
+
 Email: l.spencer.heywood@gmail.com
