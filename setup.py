@@ -1,10 +1,13 @@
 from setuptools import setup
-import os
-import io
+
+def readme():
+    with open('README.md') as f:
+        return f.read()
 
 setup(name='urlscan-py',
       version='1.0',
       description='urlscan.io API wrapper',
+      long_description=readme(),
       url='https://github.com/heywoodlh/urlscan-py',
       author='Spencer Heywood',
       author_email='l.spencer.heywood@gmail.com',
@@ -20,8 +23,3 @@ setup(name='urlscan-py',
       ],
       zip_safe=False)
 
-here = os.path.dirname(__file__)
-
-readme_path = os.path.join(here, 'README.md')
-with io.open(readme_path, encoding='utf-8') as readme_file:
-    long_description = readme_file.read()
