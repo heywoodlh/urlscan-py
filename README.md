@@ -129,3 +129,5 @@ optional arguments:
 
 
 ## To do:
+
+1. Package urlscan-py for PyPI.
