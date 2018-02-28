@@ -184,11 +184,17 @@ def download_png(x, y):
 def query():
     for target_uuid in args.uuid:
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
+        null_response_string = '"status": 404'
 
+        
         formatted_uuid = target_uuid.replace("-", "_")
         target_dir = args.dir + '/' + formatted_uuid + '/'
         
         r = response.content.decode("utf-8")
+        
+        if null_response_string in r:
+            print('Results not processed. Please check again later.')
+            sys.exit(0)
 
         if not args.quiet:
             print(r)

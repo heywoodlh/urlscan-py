@@ -129,5 +129,3 @@ optional arguments:
 
 
 ## To do:
-
-1. Periodically poll the urlscan.io API to see if a scan is finished
