@@ -17,11 +17,7 @@ Urlscan-py is a Python wrapper for urlscan.io's API to scan URLs.
 
 Via PyPI:
 
-`git clone https://github.com/heywoodlh/urlscan-py.git`
-
-`cd urlscan-py`
-
-`sudo pip3 install .`
+`sudo pip3 install urlscan-py`
 
 
 ### Saving the API key:
