@@ -52,9 +52,9 @@ parser_retrieve.add_argument('--uuid', help='UUID(s) to retrieve scans for', nar
 parser_retrieve.add_argument('--db', help='specify different database file to query', metavar='FILE', default=urlscan_default_db)
 parser_retrieve.add_argument('--api', help='urlscan API key', metavar='KEY')
 parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY', default=saved_scan_dir)
+parser_retrieve.add_argument('--dom', help='save dom file from retrieved result', action="store_true")
+parser_retrieve.add_argument('--png', help='save screenshot as png', action="store_true")
 parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="store_true")
-parser_retrieve.add_argument('--dom', help='urlscan retrieve DOM', action="store_true")
-parser_retrieve.add_argument('--png', help='urlscan retrieve screenshot', action="store_true")
 
 args = parser.parse_args()
 
@@ -196,10 +196,9 @@ def query():
         if hasattr(args, 'dir'):
             save_to_dir(target_dir, target_uuid, str(r))
         
-        if hasattr(args, 'dom'):
+        if args.dom:
             download_dom(target_uuid, target_dir)
-
-        if hasattr(args, 'png'):
+        if args.png:
             download_png(target_uuid, target_dir)
 
         time.sleep(3)
