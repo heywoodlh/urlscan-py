@@ -3,13 +3,15 @@ import argparse
 import sys, os
 import errno, pathlib, re
 import datetime, time
-import json, requests
+import json, requests, urllib.request
 import sqlite3
 
 ### Variables that need to be set by user
 
 ### urlscan's config directory
 urlscan_dir = str(pathlib.Path.home()) + '/.urlscan'
+
+saved_scan_dir = urlscan_dir + '/saved_scans'
 
 ### urlscan's local database
 urlscan_default_db = urlscan_dir + '/urlscan.db'
@@ -48,9 +50,11 @@ parser_search.add_argument('--api', help='urlscan API key', metavar='KEY')
 parser_retrieve = subparsers.add_parser('retrieve', help='retrieve scan results')
 parser_retrieve.add_argument('--uuid', help='UUID(s) to retrieve scans for', nargs='+', metavar='UUID', required='True')
 parser_retrieve.add_argument('--db', help='specify different database file to query', metavar='FILE', default=urlscan_default_db)
-parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY', default='saved_scans')
-parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="store_true")
 parser_retrieve.add_argument('--api', help='urlscan API key', metavar='KEY')
+parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY', default=saved_scan_dir)
+parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="store_true")
+parser_retrieve.add_argument('--dom', help='urlscan retrieve DOM', action="store_true")
+parser_retrieve.add_argument('--png', help='urlscan retrieve screenshot', action="store_true")
 
 args = parser.parse_args()
 
@@ -148,20 +152,57 @@ def search():
         print(c.fetchone())
     
 
+def download_dom(x, y):
+    target_uuid = x
+    dom_url = 'https://urlscan.io/dom/' + target_uuid + '/'
+    target_dom = y + 'site.dom'
+    try:
+        os.makedirs(y)
+    except FileExistsError:
+        pass
+    try:
+        urllib.request.urlretrieve(dom_url, str(target_dom))
+    except FileExistsError:
+        pass
+    
+
+def download_png(x, y):
+    target_uuid = x
+    png_url = 'https://urlscan.io/screenshots/' + target_uuid + '.png'
+    target_png = y + 'screenshot.png'
+    try:
+        os.makedirs(y)
+    except FileExistsError:
+        pass
+    try:
+        urllib.request.urlretrieve(png_url, str(target_png))
+    except FileExistsError:
+        pass
+
+
+
 def query():
     for target_uuid in args.uuid:
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
 
+        formatted_uuid = target_uuid.replace("-", "_")
+        target_dir = args.dir + '/' + formatted_uuid + '/'
+        
         r = response.content.decode("utf-8")
 
         if not args.quiet:
             print(r)
 
         if hasattr(args, 'dir'):
-            save_to_dir(str(args.dir), target_uuid, str(r))
+            save_to_dir(target_dir, target_uuid, str(r))
+        
+        if hasattr(args, 'dom'):
+            download_dom(target_uuid, target_dir)
+
+        if hasattr(args, 'png'):
+            download_png(target_uuid, target_dir)
 
         time.sleep(3)
-
 
 def save_history(x, y):
     ### extract UUID from json
@@ -192,6 +233,7 @@ def save_to_dir(x, y, z):
         with open(save_file_name, 'a') as out:
             out.write(z)
 
+    
 
 def main():
     initialize()
