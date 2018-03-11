@@ -84,14 +84,14 @@ By default, scans will be saved to the directory `.urlsaved_scans`. Change this 
 
 `urlscan retrieve --uuid UUID --png`
 
-The downloaded screenshot png will be stored in the default `--dir` directory which is `.urlscasaved_scans`. Specify a different `--dir` location to save the png to another directory.
+The downloaded screenshot png will be stored in the default `--dir` directory which is `~/.urlscan/saved_scans`. Specify a different `--dir` location to save the png to another directory.
 
 
 #### Save dom file:
 
 `urlscan retrieve --uuid UUID --dom`
 
-The downloaded dom file will be stored in the default `--dir` directory which is `.urlscasaved_scans`. Specify a different `--dir` location to save the dom file to another directory. 
+The downloaded dom file will be stored in the default `--dir` directory which is `~/.urlscan/saved_scans`. Specify a different `--dir` location to save the dom file to another directory. 
 
 
 
