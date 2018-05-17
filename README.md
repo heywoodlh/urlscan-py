@@ -120,4 +120,4 @@ optional arguments:
 
 Author: Spencer Heywood
 
-Email: l.spencer.heywood@gmail.com
+Email: l.spencer.heywood@protonmail.com
