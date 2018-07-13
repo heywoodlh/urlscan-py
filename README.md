@@ -36,7 +36,7 @@ The `--url` flag can accept more than one URL at a time.
 
 `urlscan scan --url https://google.com --db mydatabase.db`
 
-This would allow the user to easily review the UUIDs of previously queued scans in an sqlite3 database. This defaults to a file named '.urlscaurlscan.db' if no other database file is specified.
+This would allow the user to easily review the UUIDs of previously queued scans in an sqlite3 database. This defaults to a file named `$HOME/.urlscan/urlscan.db` if no other database file is specified.
 
 
 #### Scan multiple domains stored in file 'example-domains.txt'
