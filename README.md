@@ -16,9 +16,9 @@ Via PyPI:
 
 The API key will be stored in the default database that stores all initiated scan results. By default, this database is in `~/.urlscan/urlscan.db`. 
 
-To save the API key, use the `init` command:
+To save the API key to a local database, use the `init` command:
 
-`urlscan init --api_key xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
+`urlscan init --api xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`
 
 If the API key is entered incorrectly or some other error occurs in which the API key value in the database is incorrect, either attempt to overwrite it with the above init command or remove the database file with this command: `rm ~/.urlscan/urlscan.db`.
 
@@ -64,6 +64,9 @@ optional arguments:
 
 ```
 
+### Search local database for previous scan (must match the url that was submitted):
+
+`urlscan search --url https://google.com`
 
 
 ### Retrieve the scan results:
