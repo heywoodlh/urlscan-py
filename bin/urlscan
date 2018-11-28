@@ -208,7 +208,7 @@ def query(uuid):
         
         if null_response_string in r:
             print('Results not processed. Please check again later.')
-            sys.exit(0)
+            sys.exit(5)
 
         if not args.quiet:
             print(r)

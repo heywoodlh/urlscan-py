@@ -49,7 +49,7 @@ Each domain should be stored in a file with each domain separated by a newline.
 #### Scan command help:
 
 ```
-urlscan scan --help
+❯ urlscan scan --help
 
 usage: urlscan scan [-h] [--url URL [URL ...]] [--db FILE] [-f FILE] [-q]
                        [--api KEY]
@@ -64,9 +64,32 @@ optional arguments:
 
 ```
 
-### Search local database for previous scan (must match the url that was submitted):
+### Searching for queued or previously completed scans
+
+#### Search local database for previous scan (must match the url that was submitted):
 
 `urlscan search --url https://google.com`
+
+
+#### Search urlscan.io for public scans on a domain:
+
+`urlscan search --url https://google.com --web`
+
+
+#### Search command help:
+
+```
+❯ urlscan search --help
+
+usage: urlscan search [-h] [--url HOST [HOST ...]] [--db FILE] [--web]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --url HOST [HOST ...]
+                        url(s) to search for matching UUID
+  --db FILE             specify different database file to search
+  --web                 search urlscan.io for URL (public)
+```
 
 
 ### Retrieve the scan results:
@@ -103,7 +126,7 @@ The downloaded dom file will be stored in the default `--dir` directory which is
 ```
 urlscan retrieve --help
 
-usage: urlscan retrieve [-h] --uuid UUID [UUID ...] [--db FILE] [--api KEY]
+❯ usage: urlscan retrieve [-h] --uuid UUID [UUID ...] [--db FILE] [--api KEY]
                            [-d DIRECTORY] [--dom] [--png] [-q]
 optional arguments:
   -h, --help            show this help message and exit
