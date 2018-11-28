@@ -5,7 +5,7 @@ def readme():
         return f.read()
 
 setup(name='urlscan-py',
-      version='1.0.2.1',
+      version='1.0.3',
       description='urlscan.io API wrapper',
       long_description=readme(),
       url='https://github.com/heywoodlh/urlscan-py',
