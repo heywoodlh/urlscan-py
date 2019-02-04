@@ -1,4 +1,4 @@
-##urlscan-py
+## urlscan-py
 
 ## Description:
 
@@ -14,7 +14,7 @@ Via PyPI:
 
 ### Saving the API key:
 
-The API key will be stored in the default database that stores all initiated scan results. By default, this database is in `~/.urlscan/urlscan.db`. 
+The API key will be stored in the default database that stores all initiated scan results. By default, this database is in `~/.urlscan/urlscan.db`.
 
 To save the API key to a local database, use the `init` command:
 
@@ -117,7 +117,7 @@ The downloaded screenshot png will be stored in the default `--dir` directory wh
 
 `urlscan retrieve --uuid UUID --dom`
 
-The downloaded dom file will be stored in the default `--dir` directory which is `~/.urlscan/saved_scans`. Specify a different `--dir` location to save the dom file to another directory. 
+The downloaded dom file will be stored in the default `--dir` directory which is `~/.urlscan/saved_scans`. Specify a different `--dir` location to save the dom file to another directory.
 
 
 
