@@ -75,7 +75,7 @@ def add_key_value():
         urlscan_api = args.api
     else:
         urlscan_api = input('Please enter API key: ')
-    c.execute("INSERT OR REPLACE INTO api VALUES (?)", (urlscan_api,))
+    c.execute("INSERT OR REPLACE INTO api(key) VALUES (?)", (urlscan_api,))
     conn.commit()
     sys.exit(0)
 
