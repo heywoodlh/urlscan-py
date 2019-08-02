@@ -4,7 +4,13 @@
  docker run --rm -i heywoodlh/urlscan-py urlscan [options] ...
 ```
 
-If you want your API/DB config to persist on the host, try this:
+Get help, for example:
+
+```
+ docker run --rm -i heywoodlh/urlscan-py urlscan --help
+```
+
+If you want your API/DB config to persist on the host, use something like this:
 
 ```
 docker run --rm -i -v ~/.urlscan:/root/.urlscan heywoodlh/urlscan-py urlscan [options] ...
