@@ -6,8 +6,9 @@ def readme():
 
 setup(name='urlscan-py',
       version='1.0.5',
-      description='urlscan.io API wrapper',
+      description="urlscan.io API wrapper",
       long_description=readme(),
+      long_description_content_type='text/markdown',
       url='https://github.com/heywoodlh/urlscan-py',
       author='Spencer Heywood',
       author_email='l.spencer.heywood@gmail.com',

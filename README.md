@@ -7,7 +7,14 @@ Urlscan-py is a Python wrapper for urlscan.io's API to scan URLs.
 
 ## Installation and Usage:
 
-Via PyPI:
+### Using the Docker image:
+
+`docker pull heywoodlh/urlscan-py`
+
+See the [Docker Readme](https://github.com/heywoodlh/urlscan-py/blob/master/docker/README.md) for a few simple examples on how to use the image.
+
+
+### Installation Via PyPI:
 
 `pip3 install --user urlscan-py`
 
