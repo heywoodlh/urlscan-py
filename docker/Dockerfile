@@ -6,7 +6,7 @@ RUN \
   apk add python3 && \
   pip3 install urlscan-py
 
-# Define working directory.
 RUN mkdir /data
+RUN mkdir -p /root/.urlscan/
 
 CMD '/bin/ash'
