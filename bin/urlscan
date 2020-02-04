@@ -93,7 +93,7 @@ def get_key_value():
     try:
         urlscan_api = ''.join(db_extract)
     except TypeError:
-        logger.error('Invalid API entry in database.')
+        logging.error('Invalid API entry in database.')
         sys.exit(1)
 
 def initialize():
@@ -281,7 +281,7 @@ def query(uuid):
         r = response.content.decode("utf-8")
         
         if null_response_string in r:
-            logger.warning('Results not processed. Please check again later.')
+            logging.warning('Results not processed. Please check again later.')
             sys.exit(5)
 
         if not args.quiet:
