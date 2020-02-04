@@ -5,6 +5,7 @@ import errno, pathlib, re
 import datetime, time
 import json, requests, urllib.request
 import sqlite3
+import logging
 
 
 ### urlscan's config directory
@@ -40,7 +41,7 @@ parser_scan.add_argument('--api', help='urlscan API key', metavar='KEY')
 
 ## Search parser
 parser_search = subparsers.add_parser('search', help='search database for UUID of url')
-parser_search.add_argument('--url', help='url(s) to search for matching UUID', nargs='+', metavar='HOST')
+parser_search.add_argument('--url', help='url(s) to search for matching UUID', nargs='+', metavar='URL', required='True')
 parser_search.add_argument('--db', help='specify different database file to search', metavar='FILE', default=urlscan_default_db)
 parser_search.add_argument('--web', help='search urlscan.io for URL (public)', action="store_true")
 
@@ -49,6 +50,7 @@ parser_retrieve = subparsers.add_parser('retrieve', help='retrieve scan results'
 parser_retrieve.add_argument('--uuid', help='UUID(s) to retrieve scans for', nargs='+', metavar='UUID', required='True')
 parser_retrieve.add_argument('--db', help='specify different database file to query', metavar='FILE', default=urlscan_default_db)
 parser_retrieve.add_argument('--api', help='urlscan API key', metavar='KEY')
+parser_retrieve.add_argument('-s', '--summary', help='print summary of result', action="store_true")
 parser_retrieve.add_argument('-d', '--dir', help='directory to save scans to', metavar='DIRECTORY', default=saved_scan_dir)
 parser_retrieve.add_argument('--dom', help='save dom file from retrieved result', action="store_true")
 parser_retrieve.add_argument('--png', help='save screenshot as png', action="store_true")
@@ -91,7 +93,7 @@ def get_key_value():
     try:
         urlscan_api = ''.join(db_extract)
     except TypeError:
-        print('Invalid API entry in database.')
+        logger.error('Invalid API entry in database.')
         sys.exit(1)
 
 def initialize():
@@ -145,6 +147,9 @@ def submit():
 
 
 def remote_search(url):
+    if '://' in url:
+        url = url.split("://")[1]
+
     params = (
         ('q', 'domain:%s' % url),
     )
@@ -193,6 +198,76 @@ def download_png(target_uuid, target_dir):
     except FileExistsError:
         pass
 
+def print_summary(content):
+    ### relevant aggregate data
+    request_info = content.get("data").get("requests")
+    meta_info = content.get("meta")
+    verdict_info = content.get("verdicts")
+    list_info = content.get("lists")
+    stats_info = content.get("stats")
+    page_info = content.get("page")
+    
+    ### more specific data
+    geoip_info = meta_info.get("processors").get("geoip") 
+    web_apps_info = meta_info.get("processors").get("wappa")
+    resource_info = stats_info.get("resourceStats")
+    protocol_info = stats_info.get("protocolStats")
+    ip_info = stats_info.get("ipStats")
+
+    ### enumerate countries 
+    countries = []
+    for item in resource_info:
+        country_list = item.get("countries")
+        for country in country_list:
+            if country not in countries:
+                countries.append(country)
+
+    ### enumerate web apps
+    web_apps = []
+    for app in web_apps_info.get("data"):
+        web_apps.append(app.get("app"))
+    
+    ### enumerate domains pointing to ip
+    pointed_domains = []
+    for ip in ip_info:
+        domain_list = ip.get("domains")
+        for domain in domain_list:
+            if domain not in pointed_domains:
+                pointed_domains.append(domain)
+
+
+    ### data for summary
+    page_domain = page_info.get("domain")
+    page_ip = page_info.get("ip")
+    page_country = page_info.get("country")
+    page_server = page_info.get("server")
+    ads_blocked = stats_info.get("adBlocked")
+    https_percentage = stats_info.get("securePercentage")
+    ipv6_percentage = stats_info.get("IPv6Percentage")
+    country_count = stats_info.get("uniqCountries")
+    num_requests = len(request_info)
+    is_malicious = verdict_info.get("overall").get("malicious")
+    malicious_total = verdict_info.get("engines").get("maliciousTotal")
+    ip_addresses = list_info.get("ips")
+    urls = list_info.get("urls")
+
+    
+    ### print data
+    print("Domain: " + page_domain)
+    print("IP Address: " + page_ip)
+    print("Country: " + page_country)
+    print("Server: " + page_server)
+    print("Web Apps: " + str(web_apps))
+    print("Number of Requests: " + str(num_requests))
+    print("Ads Blocked: " + str(ads_blocked))
+    print("HTTPS Requests: " + str(https_percentage) + "%")
+    print("IPv6: " + str(ipv6_percentage) + "%")
+    print("Unique Country Count: " + str(country_count))
+    print("Malicious: " + str(is_malicious))
+    print("Malicious Requests: " + str(malicious_total))
+    print("Pointed Domains: " + str(pointed_domains))
+
+
 
 def query(uuid):
     for target_uuid in uuid:
@@ -206,11 +281,12 @@ def query(uuid):
         r = response.content.decode("utf-8")
         
         if null_response_string in r:
-            print('Results not processed. Please check again later.')
+            logger.warning('Results not processed. Please check again later.')
             sys.exit(5)
 
         if not args.quiet:
-            print(r)
+            if not args.summary:
+                print(r)
 
         if hasattr(args, 'dir'):
             save_to_dir(target_dir, target_uuid, str(r))
@@ -219,6 +295,8 @@ def query(uuid):
             download_dom(target_uuid, target_dir)
         if args.png:
             download_png(target_uuid, target_dir)
+        if args.summary:
+            print_summary(response.json())
 
         time.sleep(3)
 
