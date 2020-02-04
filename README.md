@@ -131,9 +131,10 @@ The downloaded dom file will be stored in the default `--dir` directory which is
 #### Retrieve command help:
 
 ```
-urlscan retrieve --help
+❯ urlscaretrieve --help
 
-❯ usage: urlscan retrieve [-h] --uuid UUID [UUID ...] [--db FILE] [--api KEY]
+
+usage: urlscan retrieve [-h] --uuid UUID [UUID ...] [--db FILE] [--api KEY]
                            [-d DIRECTORY] [--dom] [--png] [-q]
 optional arguments:
   -h, --help            show this help message and exit
@@ -141,6 +142,7 @@ optional arguments:
                         UUID(s) to retrieve scans for
   --db FILE             specify different database file to query
   --api KEY             urlscan API key
+  -s, --summary         print summary of result
   -d DIRECTORY, --dir DIRECTORY
                         directory to save scans to
   --dom                 save dom file from retrieved result
