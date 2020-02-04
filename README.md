@@ -56,7 +56,7 @@ Each domain should be stored in a file with each domain separated by a newline.
 #### Scan command help:
 
 ```
-❯ urlscan scan --help
+urlscan scan --help
 
 usage: urlscan scan [-h] [--url URL [URL ...]] [--db FILE] [-f FILE] [-q]
                        [--api KEY]
@@ -86,7 +86,7 @@ optional arguments:
 #### Search command help:
 
 ```
-❯ urlscan search --help
+$ urlscan search --help
 
 usage: urlscan search [-h] [--url HOST [HOST ...]] [--db FILE] [--web]
 
@@ -104,6 +104,31 @@ optional arguments:
 `urlscan retrieve --uuid UUID`
 
 This will print the scan with the associated UUID to STDOUT. The `--uuid` flag can accept more than one UUID at a time.
+
+
+### Retrieve a summary of a scan:
+
+`$ urlscan retrieve --uuid UUID --summary`
+
+The results look similar to this:
+
+```
+Domain: example.domain
+IP Address: xxx.xxx.xxx.xxx
+Country: US
+Server: nginx
+Web Apps: ['Nginx']
+Number of Requests: 3
+Ads Blocked: 0
+HTTPS Requests: 100%
+IPv6: 0%
+Unique Country Count: 1
+Malicious: False
+Malicious Requests: 0
+Pointed Domains: ['example.domain']
+```
+
+
 
 
 #### Save retrieved results to specific directory:
@@ -131,8 +156,7 @@ The downloaded dom file will be stored in the default `--dir` directory which is
 #### Retrieve command help:
 
 ```
-❯ urlscaretrieve --help
-
+$ urlscan retrieve --help
 
 usage: urlscan retrieve [-h] --uuid UUID [UUID ...] [--db FILE] [--api KEY]
                            [-d DIRECTORY] [--dom] [--png] [-q]
