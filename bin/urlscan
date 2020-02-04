@@ -19,9 +19,9 @@ urlscan_default_db = urlscan_dir + '/urlscan.db'
 if not os.path.exists(urlscan_dir):
         os.makedirs(urlscan_dir)
 
+
 ## argparse arguments
 parser = argparse.ArgumentParser(description="Wrapper for urlscan.io's API")
-
 subparsers = parser.add_subparsers(help='commands', dest='command')
 
 ## Init subparser
@@ -194,7 +194,6 @@ def download_png(target_uuid, target_dir):
         pass
 
 
-
 def query(uuid):
     for target_uuid in uuid:
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
@@ -255,6 +254,9 @@ def save_to_dir(target_dir, target_uuid, r):
     
 
 def main():
+    if args.command == 'init':
+        initialize()
+
     if args.command == 'scan':
         initialize()
         submit()
