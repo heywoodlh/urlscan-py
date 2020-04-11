@@ -9,4 +9,4 @@ RUN \
 RUN mkdir /data
 RUN mkdir -p /root/.urlscan/
 
-ENTRYPOINT 'urlscan'
+ENTRYPOINT ["urlscan"]
