@@ -178,31 +178,35 @@ def search(search_urls, remote_true):
                 t = (url,)
                 c.execute("SELECT url, uuid, datetime FROM scanned_urls WHERE url LIKE ?", ['%'+url+'%'])
                 for line in c.fetchall():
-                    print(line)
+                    if line[0-2]:
+                        scan_url = line[0]
+                        scan_uuid = line[1]
+                        scan_date = line[2]
+                        print(scan_date + ' || ' + scan_url  + ': ' + scan_uuid)
 
 
     
 
-def download_dom(target_uuid, target_dir):
+def download_dom(target_uuid, target_dir, save_template):
     dom_url = 'https://urlscan.io/dom/' + target_uuid + '/'
     try:
         os.makedirs(target_dir)
     except FileExistsError:
         pass
-    target_dom = target_dir + 'site.dom'
+    target_dom = save_template + '.dom'
     try:
         urllib.request.urlretrieve(dom_url, str(target_dom))
     except FileExistsError:
         pass
     
 
-def download_png(target_uuid, target_dir):
+def download_png(target_uuid, target_dir, save_template):
     png_url = 'https://urlscan.io/screenshots/' + target_uuid + '.png'
     try:
         os.makedirs(target_dir)
     except FileExistsError:
         pass
-    target_png = target_dir + 'screenshot.png'
+    target_png = save_template + '.png'
     try:
         urllib.request.urlretrieve(png_url, str(target_png))
     except FileExistsError:
@@ -285,27 +289,30 @@ def query(uuid):
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
         null_response_string = '"status": 404'
 
-        
-        formatted_uuid = target_uuid.replace("-", "_")
-        target_dir = args.dir + '/' + formatted_uuid + '/'
-        
         r = response.content.decode("utf-8")
         
         if null_response_string in r:
-            logging.warning('Results not processed. Please check again later.')
+            print('Results not processed. Please check again later.')
             sys.exit(5)
 
         if not args.quiet:
             if not args.summary:
                 print(r)
 
+        #formatted_uuid = target_uuid.replace("-", "_")
+        url = response.json().get("task").get("url").split("://")[1]
+        submission_time = response.json().get("task").get("time")
+        target_dir = args.dir + '/' + url + '/'
+
+        save_template = target_dir + submission_time + '_' + target_uuid
+
         if hasattr(args, 'dir'):
-            save_to_dir(target_dir, target_uuid, str(r))
+            save_to_dir(target_dir, save_template, str(r))
         
         if args.dom:
-            download_dom(target_uuid, target_dir)
+            download_dom(target_uuid, target_dir, save_template)
         if args.png:
-            download_png(target_uuid, target_dir)
+            download_png(target_uuid, target_dir, save_template)
         if args.summary:
             print_summary(response.json())
 
@@ -329,11 +336,11 @@ def save_history(target_url, r):
     conn.close()
 
 
-def save_to_dir(target_dir, target_uuid, r):
+def save_to_dir(target_dir, save_template, r):
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
 
-    save_file_name = target_dir + '/' + target_uuid
+    save_file_name = save_template + '.json'
 
     path_to_file = pathlib.Path(save_file_name)
     if not path_to_file.is_file():
