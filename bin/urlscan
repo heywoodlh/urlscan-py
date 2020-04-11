@@ -41,7 +41,7 @@ parser_scan.add_argument('--api', help='urlscan API key', metavar='KEY')
 
 ## Search parser
 parser_search = subparsers.add_parser('search', help='search database for UUID of url')
-parser_search.add_argument('--url', help='url(s) to search for matching UUID', nargs='+', metavar='URL', required='True')
+parser_search.add_argument('--url', help='url(s) to search for matching UUID', nargs='+', metavar='<URL>, <all>', required='True')
 parser_search.add_argument('--db', help='specify different database file to search', metavar='FILE', default=urlscan_default_db)
 parser_search.add_argument('--web', help='search urlscan.io for URL (public)', action="store_true")
 
@@ -159,16 +159,20 @@ def remote_search(url):
     time.sleep(2)
 
 
-def search(search_urls):
+def search(search_urls, remote_true):
     search_urls
     connect_db()
     for url in search_urls:
-        if args.web:
+        if remote_true:
             remote_search(url)
         else:
-            t = (url,)
-            c.execute('SELECT * FROM scanned_urls WHERE url=?', t)
-            print(c.fetchone())
+            if url == 'all':
+                c.execute('SELECT * FROM scanned_urls')
+                print(c.fetchall())
+            else:
+                t = (url,)
+                c.execute("SELECT * FROM scanned_urls WHERE url LIKE ?", ['%'+url+'%'])
+                print(c.fetchone())
 
 
     
@@ -253,19 +257,20 @@ def print_summary(content):
 
     
     ### print data
-    print("Domain: " + page_domain)
-    print("IP Address: " + page_ip)
-    print("Country: " + page_country)
-    print("Server: " + page_server)
-    print("Web Apps: " + str(web_apps))
-    print("Number of Requests: " + str(num_requests))
-    print("Ads Blocked: " + str(ads_blocked))
-    print("HTTPS Requests: " + str(https_percentage) + "%")
-    print("IPv6: " + str(ipv6_percentage) + "%")
-    print("Unique Country Count: " + str(country_count))
-    print("Malicious: " + str(is_malicious))
-    print("Malicious Requests: " + str(malicious_total))
-    print("Pointed Domains: " + str(pointed_domains))
+    if str(page_ip) != "None":
+        print("Domain: " + page_domain)
+        print("IP Address: " + str(page_ip))
+        print("Country: " + page_country)
+        print("Server: " + page_server)
+        print("Web Apps: " + str(web_apps))
+        print("Number of Requests: " + str(num_requests))
+        print("Ads Blocked: " + str(ads_blocked))
+        print("HTTPS Requests: " + str(https_percentage) + "%")
+        print("IPv6: " + str(ipv6_percentage) + "%")
+        print("Unique Country Count: " + str(country_count))
+        print("Malicious: " + str(is_malicious))
+        print("Malicious Requests: " + str(malicious_total))
+        print("Pointed Domains: " + str(pointed_domains))
 
 
 
@@ -340,7 +345,7 @@ def main():
         submit()
 
     if args.command == 'search':
-        search(args.url)
+        search(args.url, args.web)
 
     if args.command == 'retrieve':
         initialize()
