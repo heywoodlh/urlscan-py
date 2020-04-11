@@ -73,7 +73,12 @@ optional arguments:
 
 ### Searching for queued or previously completed scans
 
-#### Search local database for previous scan (must match the url that was submitted):
+#### Search local database for all previously queued scans:
+
+`urlscan search --url all`
+
+
+#### Search local database for previous scan:
 
 `urlscan search --url https://google.com`
 
@@ -87,12 +92,11 @@ optional arguments:
 
 ```
 $ urlscan search --help
-
-usage: urlscan search [-h] [--url HOST [HOST ...]] [--db FILE] [--web]
+usage: urlscan search [-h] --url <URL>, <all> [<URL>, <all> ...] [--db FILE] [--web]
 
 optional arguments:
   -h, --help            show this help message and exit
-  --url HOST [HOST ...]
+  --url <URL>, <all> [<URL>, <all> ...]
                         url(s) to search for matching UUID
   --db FILE             specify different database file to search
   --web                 search urlscan.io for URL (public)

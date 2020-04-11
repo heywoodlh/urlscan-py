@@ -167,12 +167,18 @@ def search(search_urls, remote_true):
             remote_search(url)
         else:
             if url == 'all':
-                c.execute('SELECT * FROM scanned_urls')
-                print(c.fetchall())
+                c.execute('SELECT url, uuid, datetime FROM scanned_urls')
+                for line in c.fetchall():
+                    if line[0-2]:
+                        scan_url = line[0]
+                        scan_uuid = line[1]
+                        scan_date = line[2]
+                        print(scan_date + ' || ' + scan_url  + ': ' + scan_uuid)
             else:
                 t = (url,)
-                c.execute("SELECT * FROM scanned_urls WHERE url LIKE ?", ['%'+url+'%'])
-                print(c.fetchone())
+                c.execute("SELECT url, uuid, datetime FROM scanned_urls WHERE url LIKE ?", ['%'+url+'%'])
+                for line in c.fetchall():
+                    print(line)
 
 
     
