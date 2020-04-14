@@ -5,7 +5,6 @@ import errno, pathlib, re
 import datetime, time
 import json, requests, urllib.request
 import sqlite3
-import logging
 
 
 ### urlscan's config directory
@@ -32,7 +31,7 @@ parser_init.add_argument('--db', help='specify different database file to search
 
 ## Scan parser
 parser_scan = subparsers.add_parser('scan', help='scan a url')
-parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL')
+parser_scan.add_argument('--url', help='URL(s) to scan', nargs='+', metavar='URL', default="*")
 parser_scan.add_argument('--db', help='specify different database file initiated scans will be saved to', metavar='FILE', default=urlscan_default_db)
 parser_scan.add_argument('-p', '--public', help='submit a public urlscan scan', action="store_true")
 parser_scan.add_argument('-f', '--file', help='file with url(s) to scan')
@@ -41,7 +40,7 @@ parser_scan.add_argument('--api', help='urlscan API key', metavar='KEY')
 
 ## Search parser
 parser_search = subparsers.add_parser('search', help='search database for UUID of url')
-parser_search.add_argument('--url', help='url(s) to search for matching UUID', nargs='+', metavar='<URL>, <all>', required='True')
+parser_search.add_argument('--url', help='url(s) to search for matching UUID', nargs='+', metavar='URL', default="all")
 parser_search.add_argument('--db', help='specify different database file to search', metavar='FILE', default=urlscan_default_db)
 parser_search.add_argument('--web', help='search urlscan.io for URL (public)', action="store_true")
 
@@ -79,7 +78,6 @@ def add_key_value():
         urlscan_api = input('Please enter API key: ')
     c.execute("INSERT OR REPLACE INTO api(key) VALUES (?)", (urlscan_api,))
     conn.commit()
-    sys.exit(0)
 
 
 def get_key_value():
@@ -89,11 +87,12 @@ def get_key_value():
         c.execute("SELECT * FROM api")
     except sqlite3.OperationalError:
         add_key_value()
+        c.execute("SELECT * FROM api")
     db_extract = c.fetchone()
     try:
         urlscan_api = ''.join(db_extract)
     except TypeError:
-        logging.error('Invalid API entry in database.')
+        print('Invalid API entry in database.')
         sys.exit(1)
 
 def initialize():
@@ -113,11 +112,11 @@ def initialize():
         get_key_value()
 
 
-def submit():
-    if args.file: 
-        urls_to_scan = [line.rstrip('\n') for line in open(args.file)]
+def submit(url, urlscan_api, file, db, public, quiet):
+    if file: 
+        urls_to_scan = [line.rstrip('\n') for line in open(file)]
     else:
-        urls_to_scan = args.url
+        urls_to_scan = url
 
     for target_url in urls_to_scan:
         headers = {
@@ -125,7 +124,7 @@ def submit():
             'API-Key': urlscan_api,
         }
 
-        if not args.public:
+        if not public:
             data = '{"url": "%s"}' % target_url
         else:
             data = '{"url": "%s", "public": "on"}' % target_url 
@@ -136,14 +135,14 @@ def submit():
 
         r = response.content.decode("utf-8")
 
-        if not args.quiet:
+        if not quiet:
             print(r)
 
-        if args.db:
+        if db:
             save_history(target_url, r)
 
-
         time.sleep(3)
+
 
 
 def remote_search(url):
@@ -162,12 +161,22 @@ def remote_search(url):
 def search(search_urls, remote_true):
     search_urls
     connect_db()
+    
+    if isinstance(search_urls, str):
+        staging_list = []
+        staging_list += [search_urls]
+        search_urls = staging_list
+    
     for url in search_urls:
         if remote_true:
             remote_search(url)
         else:
-            if url == 'all':
-                c.execute('SELECT url, uuid, datetime FROM scanned_urls')
+            if url == "all":
+                try:
+                    c.execute('SELECT * FROM scanned_urls')
+                except sqlite3.OperationalError:
+                    print("No scan history in database.")
+                    sys.exit(5)
                 for line in c.fetchall():
                     if line[0-2]:
                         scan_url = line[0]
@@ -176,7 +185,12 @@ def search(search_urls, remote_true):
                         print(scan_date + ' || ' + scan_url  + ': ' + scan_uuid)
             else:
                 t = (url,)
-                c.execute("SELECT url, uuid, datetime FROM scanned_urls WHERE url LIKE ?", ['%'+url+'%'])
+                try:
+                    c.execute("SELECT * FROM scanned_urls WHERE url LIKE ?", ['%'+url+'%'])
+                except sqlite3.OperationalError:
+                    print("No scan history in database.")
+                    sys.exit(5)
+
                 for line in c.fetchall():
                     if line[0-2]:
                         scan_url = line[0]
@@ -355,7 +369,7 @@ def main():
 
     if args.command == 'scan':
         initialize()
-        submit()
+        submit(args.url, urlscan_api, args.file, args.db, args.public, args.quiet)
 
     if args.command == 'search':
         search(args.url, args.web)

@@ -48,7 +48,7 @@ This would allow the user to easily review the UUIDs of previously queued scans 
 
 #### Scan multiple domains stored in file 'example-domains.txt'
 
-`urlscan scan --url * --file 'example-domains.txt'`
+`urlscan scan --file 'example-domains.txt'`
 
 Each domain should be stored in a file with each domain separated by a newline.
 
@@ -75,31 +75,30 @@ optional arguments:
 
 #### Search local database for all previously queued scans:
 
-`urlscan search --url all`
+`urlscan search`
 
 
 #### Search local database for previous scan:
 
-`urlscan search --url https://google.com`
+`urlscan search --url example.com`
 
 
 #### Search urlscan.io for public scans on a domain:
 
-`urlscan search --url https://google.com --web`
+`urlscan search --url example.com --web`
 
 
 #### Search command help:
 
 ```
 $ urlscan search --help
-usage: urlscan search [-h] --url <URL>, <all> [<URL>, <all> ...] [--db FILE] [--web]
+usage: urlscan search [-h] [--url URL [URL ...]] [--db FILE] [--web]
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --url <URL>, <all> [<URL>, <all> ...]
-                        url(s) to search for matching UUID
-  --db FILE             specify different database file to search
-  --web                 search urlscan.io for URL (public)
+  -h, --help           show this help message and exit
+  --url URL [URL ...]  url(s) to search for matching UUID
+  --db FILE            specify different database file to search
+  --web                search urlscan.io for URL (public)
 ```
 
 
