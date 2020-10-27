@@ -301,14 +301,14 @@ def print_summary(content):
 def query(uuid):
     for target_uuid in uuid:
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
-        null_response_string = '"status": 404'
-
+        status = response.status_code
+        
+        if status != requests.codes.ok:
+            print('Results not processed. Please check again later:', status)
+            sys.exit(5)
+        
         r = response.content.decode("utf-8")
         
-        if null_response_string in r:
-            print('Results not processed. Please check again later.')
-            sys.exit(5)
-
         if not args.quiet:
             if not args.summary:
                 print(r)
