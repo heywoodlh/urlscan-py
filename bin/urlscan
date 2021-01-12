@@ -282,7 +282,7 @@ def submit(url, urlscan_api, file, db, public, quiet):
     for target_url in urls_to_scan:
 
         if len(target_url)<=5 or target_url[0]=="*":
-            print("%s is an invalid URL. Aborting the scan." % target_url)
+            print("URL '%s' is invalid." % target_url)
             continue
 
         headers = {
