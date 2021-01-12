@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import argparse
-import sys, os, time
+import sys, os
 import errno, pathlib, re
 import datetime, time
 import json, requests, urllib.request
@@ -308,7 +308,7 @@ def submit(url, urlscan_api, file, db, public, quiet):
             elif json_response['status'] == 429:
                 print("Can't continue the scan for %s due to the following error: %s. Pausing the scan." % (target_url, json_response['message']))
                 sleep_time = int(re.findall('\d+', json_response['message'])[1])+5
-                if sleep_time >= 60:
+                if sleep_time > 60:
                     print("You've run out of (private or public) scans for the day. Your quota will be reset tomorrow.")
                     print("You may re-try execution using scans of a different type (-p for public, nothing for private).")
                     break
