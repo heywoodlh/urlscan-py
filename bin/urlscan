@@ -57,94 +57,6 @@ parser_retrieve.add_argument('-q', '--quiet', help='suppress output', action="st
 
 args = parser.parse_args()
 
-
-def connect_db():
-    global conn
-    conn = sqlite3.connect(args.db)
-    global c
-    c = conn.cursor()
-
-
-def add_key_value():
-    connect_db()
-    global urlscan_api
-    try:
-        c.execute('''CREATE TABLE api (key TEXT PRIMARY KEY)''')
-    except sqlite3.OperationalError:
-        pass
-    if args.api:
-        urlscan_api = args.api
-    else:
-        urlscan_api = input('Please enter API key: ')
-    c.execute("INSERT OR REPLACE INTO api(key) VALUES (?)", (urlscan_api,))
-    conn.commit()
-
-
-def get_key_value():
-    connect_db()
-    global urlscan_api
-    try:
-        c.execute("SELECT * FROM api")
-    except sqlite3.OperationalError:
-        add_key_value()
-        c.execute("SELECT * FROM api")
-    db_extract = c.fetchone()
-    try:
-        urlscan_api = ''.join(db_extract)
-    except TypeError:
-        print('Invalid API entry in database.')
-        sys.exit(1)
-
-def initialize():
-    global urlscan_api
-    if args.command == 'init':
-        try:
-            get_key_value()
-            overwrite = input('API already exists in database. Overwrite? (y/n)')
-            if overwrite == 'y':
-                add_key_value()
-        except sqlite3.OperationalError:
-            add_key_value()
-        sys.exit(0)
-    if args.api:
-        urlscan_api = args.api
-    else:
-        get_key_value()
-
-
-def submit(url, urlscan_api, file, db, public, quiet):
-    if file: 
-        urls_to_scan = [line.rstrip('\n') for line in open(file)]
-    else:
-        urls_to_scan = url
-
-    for target_url in urls_to_scan:
-        headers = {
-            'Content-Type': 'application/json',
-            'API-Key': urlscan_api,
-        }
-
-        if not public:
-            data = '{"url": "%s"}' % target_url
-        else:
-            data = '{"url": "%s", "public": "on"}' % target_url 
-
-        response = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=data)
-
-        ## end POST request
-
-        r = response.content.decode("utf-8")
-
-        if not quiet:
-            print(r)
-
-        if db:
-            save_history(target_url, r)
-
-        time.sleep(3)
-
-
-
 def remote_search(url):
     if '://' in url:
         url = url.split("://")[1]
@@ -161,12 +73,12 @@ def remote_search(url):
 def search(search_urls, remote_true):
     search_urls
     connect_db()
-    
+
     if isinstance(search_urls, str):
         staging_list = []
         staging_list += [search_urls]
         search_urls = staging_list
-    
+
     for url in search_urls:
         if remote_true:
             remote_search(url)
@@ -199,7 +111,7 @@ def search(search_urls, remote_true):
                         print(scan_date + ' || ' + scan_url  + ': ' + scan_uuid)
 
 
-    
+
 
 def download_dom(target_uuid, target_dir, save_template):
     dom_url = 'https://urlscan.io/dom/' + target_uuid + '/'
@@ -212,7 +124,7 @@ def download_dom(target_uuid, target_dir, save_template):
         urllib.request.urlretrieve(dom_url, str(target_dom))
     except FileExistsError:
         pass
-    
+
 
 def download_png(target_uuid, target_dir, save_template):
     png_url = 'https://urlscan.io/screenshots/' + target_uuid + '.png'
@@ -234,15 +146,15 @@ def print_summary(content):
     list_info = content.get("lists")
     stats_info = content.get("stats")
     page_info = content.get("page")
-    
+
     ### more specific data
-    geoip_info = meta_info.get("processors").get("geoip") 
+    geoip_info = meta_info.get("processors").get("geoip")
     web_apps_info = meta_info.get("processors").get("wappa")
     resource_info = stats_info.get("resourceStats")
     protocol_info = stats_info.get("protocolStats")
     ip_info = stats_info.get("ipStats")
 
-    ### enumerate countries 
+    ### enumerate countries
     countries = []
     for item in resource_info:
         country_list = item.get("countries")
@@ -254,7 +166,7 @@ def print_summary(content):
     web_apps = []
     for app in web_apps_info.get("data"):
         web_apps.append(app.get("app"))
-    
+
     ### enumerate domains pointing to ip
     pointed_domains = []
     for ip in ip_info:
@@ -279,7 +191,7 @@ def print_summary(content):
     ip_addresses = list_info.get("ips")
     urls = list_info.get("urls")
 
-    
+
     ### print data
     if str(page_ip) != "None":
         print("Domain: " + page_domain)
@@ -302,13 +214,13 @@ def query(uuid):
     for target_uuid in uuid:
         response = requests.get("https://urlscan.io/api/v1/result/%s" % target_uuid)
         status = response.status_code
-        
+
         if status != requests.codes.ok:
             print('Results not processed. Please check again later:', status)
             sys.exit(5)
-        
+
         r = response.content.decode("utf-8")
-        
+
         if not args.quiet:
             if not args.summary:
                 print(r)
@@ -322,7 +234,7 @@ def query(uuid):
 
         if hasattr(args, 'dir'):
             save_to_dir(target_dir, save_template, str(r))
-        
+
         if args.dom:
             download_dom(target_uuid, target_dir, save_template)
         if args.png:
@@ -361,7 +273,111 @@ def save_to_dir(target_dir, save_template, r):
         with open(save_file_name, 'a') as out:
             out.write(r)
 
-    
+def submit(url, urlscan_api, file, db, public, quiet):
+    if file:
+        urls_to_scan = [line.rstrip('\n') for line in open(file)]
+    else:
+        urls_to_scan = url
+
+    for target_url in urls_to_scan:
+
+        if len(target_url)<=5 or target_url[0]=="*":
+            print("URL '%s' is invalid." % target_url)
+            continue
+
+        headers = {
+            'Content-Type': 'application/json',
+            'API-Key': urlscan_api,
+        }
+
+        if not public:
+            data = '{"url": "%s"}' % target_url
+        else:
+            data = '{"url": "%s", "public": "on"}' % target_url
+
+        response = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=data)
+
+        # Support for errors or black-listed domains
+        json_response = json.loads(response.text)
+
+        # Checks for API quota match or a different error
+        if 'status' in json_response.keys():
+            if json_response['status'] == 400:
+                print("Error: %s. Aborting scan for %s." % (json_response['description'], target_url))
+                continue
+            elif json_response['status'] == 429:
+                print("Error: %s. Pausing scan for %s." % (json_response['description'], target_url))
+                sleep_time = int(re.findall('\d+', json_response['message'])[1])+5
+                if sleep_time > 60:
+                    print("API submission quota has been met: https://urlscan.io/about-api/#ratelimit")
+                    print("Tip: retry using scans of a different type (-p for public, nothing for private)")
+                    break
+                print("Repeating scan after %s seconds" % sleep_time)
+                time.sleep(int(sleep_time))
+                response = requests.post('https://urlscan.io/api/v1/scan/', headers=headers, data=data)
+
+        ## end POST request
+
+        r = response.content.decode("utf-8")
+        if not quiet:
+            print(r)
+
+        if db:
+            save_history(target_url, r)
+
+        time.sleep(3)
+
+
+def add_key_value():
+    connect_db()
+    global urlscan_api
+    try:
+        c.execute('''CREATE TABLE api (key TEXT PRIMARY KEY)''')
+    except sqlite3.OperationalError:
+        pass
+    if args.api:
+        urlscan_api = args.api
+    else:
+        urlscan_api = input('Please enter API key: ')
+    c.execute("INSERT OR REPLACE INTO api(key) VALUES (?)", (urlscan_api,))
+    conn.commit()
+
+def connect_db():
+    global conn
+    conn = sqlite3.connect(args.db)
+    global c
+    c = conn.cursor()
+
+def get_key_value():
+    connect_db()
+    global urlscan_api
+    try:
+        c.execute("SELECT * FROM api")
+    except sqlite3.OperationalError:
+        add_key_value()
+        c.execute("SELECT * FROM api")
+    db_extract = c.fetchone()
+    try:
+        urlscan_api = ''.join(db_extract)
+    except TypeError:
+        print('Invalid API entry in database.')
+        sys.exit(1)
+
+def initialize():
+    global urlscan_api
+    if args.command == 'init':
+        try:
+            get_key_value()
+            overwrite = input('API entry already exists in database. Overwrite? (y/n)')
+            if overwrite == 'y':
+                add_key_value()
+        except sqlite3.OperationalError:
+            add_key_value()
+        sys.exit(0)
+    if args.api:
+        urlscan_api = args.api
+    else:
+        get_key_value()
 
 def main():
     if args.command == 'init':
