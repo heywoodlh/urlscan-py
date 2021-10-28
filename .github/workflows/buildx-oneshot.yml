@@ -28,7 +28,7 @@ jobs:
         name: Get urlscan-py version
         id: urlscan_version
         run: |
-          grep version setup.py | cut -d\' -f2 >> $GITHUB_ENV
+          echo VERSION=$(grep version setup.py | cut -d\' -f2) >> $GITHUB_ENV
       -
         name: Build and push urlscan-py
         uses: docker/build-push-action@v2
